@@ -2,14 +2,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import Header from '@/components/Header';
+import CartSheet from '@/components/CartSheet';
+import PaymentDialog from '@/components/PaymentDialog';
 
 interface Product {
   id: number;
@@ -38,8 +34,6 @@ export default function Index() {
   const [cart, setCart] = useState<number[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto'>('card');
-  const [selectedCrypto, setSelectedCrypto] = useState('BTC');
 
   const filteredProducts = activeCategory === 'all' 
     ? products 
@@ -56,48 +50,17 @@ export default function Index() {
   const cartItems = cart.map(id => products.find(p => p.id === id)!);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
 
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    setIsPaymentOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 glass border-b border-border/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
-                <Icon name="Zap" size={24} className="text-white" />
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                StarShop
-              </h1>
-            </div>
-            
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
-              <a href="#stars" className="text-foreground/80 hover:text-foreground transition-colors">Stars</a>
-              <a href="#premium" className="text-foreground/80 hover:text-foreground transition-colors">Premium</a>
-              <a href="#nft" className="text-foreground/80 hover:text-foreground transition-colors">NFT</a>
-            </nav>
-
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="relative"
-                onClick={() => setIsCartOpen(true)}
-              >
-                <Icon name="ShoppingCart" size={20} />
-                {cart.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-accent">
-                    {cart.length}
-                  </Badge>
-                )}
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Icon name="User" size={20} />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header 
+        cartCount={cart.length} 
+        onCartClick={() => setIsCartOpen(true)} 
+      />
 
       <section className="relative overflow-hidden py-20 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20" />
@@ -237,267 +200,21 @@ export default function Index() {
         </div>
       </section>
 
-      {isCartOpen && (
-        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-          <SheetContent className="w-full sm:max-w-lg glass border-border/50">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 text-2xl">
-              <Icon name="ShoppingCart" size={24} />
-              Корзина
-            </SheetTitle>
-          </SheetHeader>
+      <CartSheet
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        totalPrice={totalPrice}
+        onRemoveItem={removeFromCart}
+        onCheckout={handleCheckout}
+      />
 
-          <div className="py-6 space-y-4">
-            {cart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-                <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center">
-                  <Icon name="ShoppingCart" size={40} className="text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Корзина пуста</h3>
-                  <p className="text-sm text-muted-foreground">Добавьте товары из каталога</p>
-                </div>
-                <Button 
-                  onClick={() => setIsCartOpen(false)}
-                  className="bg-gradient-to-r from-primary to-secondary"
-                >
-                  Перейти в каталог
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                  {cartItems.map((item, index) => (
-                    <Card key={index} className="glass border-border/50 p-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br flex-shrink-0 flex items-center justify-center ${
-                          item.category === 'stars' ? 'from-amber-500 to-orange-500' :
-                          item.category === 'premium' ? 'from-blue-500 to-purple-500' :
-                          'from-pink-500 to-purple-500'
-                        }`}>
-                          <Icon name={item.icon as any} size={20} className="text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold truncate">{item.name}</h4>
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
-                          <p className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mt-1">
-                            {item.price} ₽
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeFromCart(index)}
-                          className="flex-shrink-0 hover:bg-destructive/20 hover:text-destructive"
-                        >
-                          <Icon name="Trash2" size={18} />
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-lg">
-                    <span className="text-muted-foreground">Товаров:</span>
-                    <span className="font-semibold">{cart.length}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-2xl font-bold">
-                    <span>Итого:</span>
-                    <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                      {totalPrice} ₽
-                    </span>
-                  </div>
-                </div>
-
-                <SheetFooter className="flex-col sm:flex-col gap-2 pt-4">
-                  <Button 
-                    size="lg" 
-                    className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white gap-2"
-                    onClick={() => {
-                      setIsCartOpen(false);
-                      setIsPaymentOpen(true);
-                    }}
-                  >
-                    <Icon name="CreditCard" size={20} />
-                    Оформить заказ
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="w-full glass"
-                    onClick={() => setIsCartOpen(false)}
-                  >
-                    Продолжить покупки
-                  </Button>
-                </SheetFooter>
-              </>
-            )}
-          </div>
-        </SheetContent>
-        </Sheet>
-      )}
-
-      {isPaymentOpen && (
-        <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
-          <DialogContent className="sm:max-w-2xl glass border-border/50">
-            <DialogHeader>
-              <DialogTitle className="text-2xl flex items-center gap-2">
-                <Icon name="CreditCard" size={28} />
-                Оформление заказа
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-6 py-4">
-              <div className="glass p-4 rounded-xl space-y-3">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Icon name="ShoppingBag" size={18} />
-                  Ваш заказ
-                </h3>
-                <div className="space-y-2">
-                  {cartItems.map((item, i) => (
-                    <div key={i} className="flex justify-between text-sm">
-                      <span className="text-foreground/70">{item.name}</span>
-                      <span className="font-semibold">{item.price} ₽</span>
-                    </div>
-                  ))}
-                </div>
-                <Separator />
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Итого:</span>
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {totalPrice} ₽
-                  </span>
-                </div>
-              </div>
-
-              <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 glass">
-                  <TabsTrigger value="card" className="gap-2">
-                    <Icon name="CreditCard" size={18} />
-                    Банковская карта
-                  </TabsTrigger>
-                  <TabsTrigger value="crypto" className="gap-2">
-                    <Icon name="Coins" size={18} />
-                    Криптовалюта
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="card" className="space-y-4 mt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="cardNumber">Номер карты</Label>
-                    <Input 
-                      id="cardNumber" 
-                      placeholder="0000 0000 0000 0000" 
-                      className="glass border-border/50"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="expiry">Срок действия</Label>
-                      <Input 
-                        id="expiry" 
-                        placeholder="ММ/ГГ" 
-                        className="glass border-border/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cvv">CVV</Label>
-                      <Input 
-                        id="cvv" 
-                        placeholder="123" 
-                        type="password"
-                        maxLength={3}
-                        className="glass border-border/50"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cardHolder">Имя владельца</Label>
-                    <Input 
-                      id="cardHolder" 
-                      placeholder="IVAN IVANOV" 
-                      className="glass border-border/50"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/20 p-3 rounded-lg">
-                    <Icon name="Shield" size={16} />
-                    <span>Безопасная оплата через защищенное соединение</span>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="crypto" className="space-y-4 mt-6">
-                  <div className="space-y-2">
-                    <Label>Выберите криптовалюту</Label>
-                    <RadioGroup value={selectedCrypto} onValueChange={setSelectedCrypto}>
-                      {[
-                        { id: 'BTC', name: 'Bitcoin', icon: '₿', color: 'from-orange-500 to-orange-600' },
-                        { id: 'ETH', name: 'Ethereum', icon: 'Ξ', color: 'from-blue-500 to-purple-600' },
-                        { id: 'USDT', name: 'Tether', icon: '₮', color: 'from-green-500 to-green-600' },
-                        { id: 'TON', name: 'Toncoin', icon: '💎', color: 'from-blue-400 to-cyan-500' },
-                      ].map((crypto) => (
-                        <Card 
-                          key={crypto.id} 
-                          className={`glass border-border/50 p-4 cursor-pointer transition-all ${
-                            selectedCrypto === crypto.id ? 'border-primary ring-2 ring-primary/50' : ''
-                          }`}
-                          onClick={() => setSelectedCrypto(crypto.id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${crypto.color} flex items-center justify-center text-white font-bold`}>
-                                {crypto.icon}
-                              </div>
-                              <div>
-                                <p className="font-semibold">{crypto.name}</p>
-                                <p className="text-sm text-muted-foreground">{crypto.id}</p>
-                              </div>
-                            </div>
-                            <RadioGroupItem value={crypto.id} />
-                          </div>
-                        </Card>
-                      ))}
-                    </RadioGroup>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="walletAddress">Ваш кошелек</Label>
-                    <Input 
-                      id="walletAddress" 
-                      placeholder="Введите адрес кошелька" 
-                      className="glass border-border/50 font-mono text-sm"
-                    />
-                  </div>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground bg-accent/10 p-3 rounded-lg">
-                    <Icon name="Info" size={16} className="mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-foreground mb-1">Инструкция по оплате</p>
-                      <p>После нажатия кнопки оплаты вы получите адрес для перевода. Товары будут доставлены после подтверждения транзакции.</p>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button 
-                variant="outline" 
-                className="glass"
-                onClick={() => setIsPaymentOpen(false)}
-              >
-                Отмена
-              </Button>
-              <Button 
-                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white gap-2"
-              >
-                <Icon name="Lock" size={18} />
-                Оплатить {totalPrice} ₽
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+      <PaymentDialog
+        isOpen={isPaymentOpen}
+        onClose={() => setIsPaymentOpen(false)}
+        cartItems={cartItems}
+        totalPrice={totalPrice}
+      />
 
       <footer className="border-t border-border/50 py-8 glass">
         <div className="container mx-auto px-4">
