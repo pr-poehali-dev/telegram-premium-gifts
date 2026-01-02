@@ -78,25 +78,36 @@ export default function PaymentDialog({ isOpen, onClose, cartItems, totalPrice }
 
                 <div className="space-y-3">
                   <Label className="text-base">Выберите ваш банк</Label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3 max-h-[320px] overflow-y-auto pr-2">
                     {[
                       { name: 'Сбербанк', color: 'from-green-600 to-green-700', icon: 'Building2' },
                       { name: 'Тинькофф', color: 'from-yellow-500 to-yellow-600', icon: 'Landmark' },
                       { name: 'Альфа-Банк', color: 'from-red-600 to-red-700', icon: 'Building' },
                       { name: 'ВТБ', color: 'from-blue-600 to-blue-700', icon: 'University' },
+                      { name: 'Газпромбанк', color: 'from-blue-500 to-blue-600', icon: 'Building2' },
+                      { name: 'Россельхозбанк', color: 'from-green-500 to-green-600', icon: 'Landmark' },
+                      { name: 'Райффайзен', color: 'from-yellow-600 to-yellow-700', icon: 'Building' },
+                      { name: 'Совкомбанк', color: 'from-orange-500 to-orange-600', icon: 'Building2' },
+                      { name: 'Открытие', color: 'from-cyan-600 to-cyan-700', icon: 'Landmark' },
+                      { name: 'Почта Банк', color: 'from-indigo-600 to-indigo-700', icon: 'Building' },
+                      { name: 'МКБ', color: 'from-purple-600 to-purple-700', icon: 'University' },
+                      { name: 'Росбанк', color: 'from-red-500 to-red-600', icon: 'Building2' },
+                      { name: 'ЮMoney', color: 'from-violet-600 to-violet-700', icon: 'Wallet' },
+                      { name: 'Киви', color: 'from-orange-600 to-orange-700', icon: 'Wallet' },
+                      { name: 'Яндекс Пей', color: 'from-red-600 to-yellow-500', icon: 'Wallet' },
                     ].map((bank) => (
                       <Card 
                         key={bank.name}
-                        className={`glass p-4 cursor-pointer hover:scale-105 transition-all ${
+                        className={`glass p-3 cursor-pointer hover:scale-105 transition-all ${
                           selectedBank === bank.name ? 'border-primary ring-2 ring-primary/50' : 'border-border/50'
                         }`}
                         onClick={() => setSelectedBank(bank.name)}
                       >
                         <div className="flex flex-col items-center gap-2 text-center">
-                          <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${bank.color} flex items-center justify-center`}>
-                            <Icon name={bank.icon as any} size={28} className="text-white" />
+                          <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${bank.color} flex items-center justify-center`}>
+                            <Icon name={bank.icon as any} size={22} className="text-white" />
                           </div>
-                          <span className="font-semibold text-sm">{bank.name}</span>
+                          <span className="font-semibold text-xs leading-tight">{bank.name}</span>
                         </div>
                       </Card>
                     ))}
