@@ -229,8 +229,9 @@ export default function Index() {
         </div>
       </section>
 
-      <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-        <SheetContent className="w-full sm:max-w-lg glass border-border/50">
+      {isCartOpen && (
+        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+          <SheetContent className="w-full sm:max-w-lg glass border-border/50">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-2xl">
               <Icon name="ShoppingCart" size={24} />
@@ -324,7 +325,8 @@ export default function Index() {
             )}
           </div>
         </SheetContent>
-      </Sheet>
+        </Sheet>
+      )}
 
       <footer className="border-t border-border/50 py-8 glass">
         <div className="container mx-auto px-4">
