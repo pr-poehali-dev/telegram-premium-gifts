@@ -27,8 +27,9 @@ interface PaymentDialogProps {
 }
 
 export default function PaymentDialog({ isOpen, onClose, cartItems, totalPrice }: PaymentDialogProps) {
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'sbp' | 'crypto'>('card');
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   return (
     <>
@@ -66,14 +67,18 @@ export default function PaymentDialog({ isOpen, onClose, cartItems, totalPrice }
               </div>
 
               <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 glass">
+                <TabsList className="grid w-full grid-cols-3 glass">
                   <TabsTrigger value="card" className="gap-2">
                     <Icon name="CreditCard" size={18} />
-                    Банковская карта
+                    Карта
+                  </TabsTrigger>
+                  <TabsTrigger value="sbp" className="gap-2">
+                    <Icon name="Smartphone" size={18} />
+                    СБП
                   </TabsTrigger>
                   <TabsTrigger value="crypto" className="gap-2">
                     <Icon name="Coins" size={18} />
-                    Криптовалюта
+                    Крипто
                   </TabsTrigger>
                 </TabsList>
 
@@ -117,6 +122,49 @@ export default function PaymentDialog({ isOpen, onClose, cartItems, totalPrice }
                   <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/20 p-3 rounded-lg">
                     <Icon name="Shield" size={16} />
                     <span>Безопасная оплата через защищенное соединение</span>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="sbp" className="space-y-4 mt-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="sbpPhone">Номер телефона</Label>
+                    <Input 
+                      id="sbpPhone" 
+                      placeholder="+7 (___) ___-__-__" 
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="glass border-border/50"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label>Выберите банк</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { name: 'Сбербанк', color: 'from-green-600 to-green-700' },
+                        { name: 'Тинькофф', color: 'from-yellow-500 to-yellow-600' },
+                        { name: 'Альфа-Банк', color: 'from-red-600 to-red-700' },
+                        { name: 'ВТБ', color: 'from-blue-600 to-blue-700' },
+                      ].map((bank) => (
+                        <Card 
+                          key={bank.name}
+                          className="glass border-border/50 p-4 cursor-pointer hover:border-primary/50 transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${bank.color} flex items-center justify-center text-white font-bold text-xs`}>
+                              {bank.name[0]}
+                            </div>
+                            <span className="font-semibold text-sm">{bank.name}</span>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground bg-primary/10 p-3 rounded-lg">
+                    <Icon name="Info" size={16} className="mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">Как оплатить через СБП</p>
+                      <p>После нажатия кнопки откроется приложение вашего банка. Подтвердите платеж и товары будут доставлены мгновенно.</p>
+                    </div>
                   </div>
                 </TabsContent>
 
