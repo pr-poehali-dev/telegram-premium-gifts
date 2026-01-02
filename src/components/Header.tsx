@@ -25,7 +25,6 @@ export default function Header({ cartCount, onCartClick }: HeaderProps) {
             <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
             <a href="#stars" className="text-foreground/80 hover:text-foreground transition-colors">Stars</a>
             <a href="#premium" className="text-foreground/80 hover:text-foreground transition-colors">Premium</a>
-            <a href="#nft" className="text-foreground/80 hover:text-foreground transition-colors">NFT</a>
           </nav>
 
           <div className="flex items-center gap-3">

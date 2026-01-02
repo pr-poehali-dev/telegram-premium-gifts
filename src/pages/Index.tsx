@@ -10,7 +10,7 @@ import PaymentDialog from '@/components/PaymentDialog';
 interface Product {
   id: number;
   name: string;
-  category: 'stars' | 'premium' | 'nft';
+  category: 'stars' | 'premium';
   price: number;
   description: string;
   icon: string;
@@ -24,13 +24,10 @@ const products: Product[] = [
   { id: 4, name: 'Premium 1 месяц', category: 'premium', price: 399, description: 'Все возможности Telegram', icon: 'Crown', popular: true },
   { id: 5, name: 'Premium 3 месяца', category: 'premium', price: 999, description: 'Выгодная подписка', icon: 'Crown' },
   { id: 6, name: 'Premium 6 месяцев', category: 'premium', price: 1799, description: 'Максимальная выгода', icon: 'Crown' },
-  { id: 7, name: 'Cosmic Cat NFT', category: 'nft', price: 2499, description: 'Уникальный цифровой подарок', icon: 'Sparkles' },
-  { id: 8, name: 'Cyber Dragon NFT', category: 'nft', price: 4999, description: 'Эксклюзивная коллекция', icon: 'Sparkles', popular: true },
-  { id: 9, name: 'Galaxy Bird NFT', category: 'nft', price: 1999, description: 'Редкая находка', icon: 'Sparkles' },
 ];
 
 export default function Index() {
-  const [activeCategory, setActiveCategory] = useState<'all' | 'stars' | 'premium' | 'nft'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'stars' | 'premium'>('all');
   const [cart, setCart] = useState<number[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -74,11 +71,11 @@ export default function Index() {
             </Badge>
             
             <h2 className="text-5xl md:text-7xl font-bold leading-tight">
-              Telegram Stars,
-              <br />
               <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Premium & NFT
+                Telegram Stars
               </span>
+              <br />
+              & Premium
             </h2>
             
             <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
@@ -110,7 +107,6 @@ export default function Index() {
               { id: 'all', label: 'Все товары', icon: 'Grid3x3' },
               { id: 'stars', label: 'Telegram Stars', icon: 'Star' },
               { id: 'premium', label: 'Premium', icon: 'Crown' },
-              { id: 'nft', label: 'NFT Подарки', icon: 'Sparkles' },
             ].map((cat) => (
               <Button
                 key={cat.id}
